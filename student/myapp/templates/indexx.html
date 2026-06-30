@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyTrack AI | Smart Study Habit Recommender</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
+            --accent-color: #4cc9f0;
+            --light-bg: #f8f9fa;
+            --dark-bg: #212529;
+            --success-color: #38b000;
+            --warning-color: #ff9e00;
+        }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+        }
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary-color) !important;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .nav-link {
+            font-weight: 500;
+            color: #555 !important;
+            transition: color 0.3s;
+        }
+        .nav-link:hover {
+            color: var(--primary-color) !important;
+        }
+        .hero {
+            background: linear-gradient(135deg, #4361ee, #3a0ca3);
+            color: white;
+            padding: 5rem 0;
+            margin-top: 0;
+        }
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+        .hero-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+        .features {
+            padding: 5rem 0;
+            background: var(--light-bg);
+        }
+        .feature-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            height: 100%;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid #eee;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+        }
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            color: white;
+            font-size: 1.5rem;
+        }
+        .how-it-works {
+            padding: 5rem 0;
+        }
+        .step-card {
+            text-align: center;
+            padding: 2rem;
+        }
+        .step-number {
+            width: 50px;
+            height: 50px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin: 0 auto 1rem;
+        }
+        .dashboard-preview {
+            background: var(--dark-bg);
+            color: white;
+            padding: 5rem 0;
+        }
+        .dashboard-card {
+            background: #2d3436;
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid #444;
+        }
+        .metric-badge {
+            background: rgba(76, 201, 240, 0.1);
+            color: var(--accent-color);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            border: 1px solid rgba(76, 201, 240, 0.3);
+        }
+        .cta-section {
+            background: linear-gradient(135deg, #38b000, #80ed99);
+            color: white;
+            padding: 4rem 0;
+            text-align: center;
+        }
+        .cta-btn {
+            background: white;
+            color: var(--primary-color);
+            border: none;
+            padding: 1rem 2.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .cta-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        .footer {
+            background: var(--dark-bg);
+            color: white;
+            padding: 3rem 0 1.5rem;
+        }
+        .footer-links a {
+            color: #aaa;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .footer-links a:hover {
+            color: white;
+        }
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            .hero {
+                padding: 3rem 0;
+            }
+            .features, .how-it-works, .dashboard-preview {
+                padding: 3rem 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-brain"></i> StudyTrack AI
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#how-it-works">How It Works</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Login</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <section class="hero">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <div class="hero-badge">
+                        <i class="fas fa-star me-2"></i>AI-Powered Study Optimization
+                    </div>
+                    <h1>Transform Your Study Habits with AI</h1>
+                    <p class="lead">StudyTrack AI analyzes your study patterns and provides personalized recommendations to improve focus, retention, and academic performance.</p>
+                    <a href="#features" class="btn btn-light btn-lg">
+                        <i class="fas fa-play-circle me-2"></i>See How It Works
+                    </a>
+                </div>
+                <div class="col-lg-6 text-center">
+                    <div class="position-relative">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='white' rx='15'/%3E%3Crect x='20' y='20' width='360' height='50' fill='%234361ee' rx='10'/%3E%3Crect x='20' y='90' width='120' height='20' fill='%23e9ecef' rx='5'/%3E%3Crect x='150' y='90' width='100' height='20' fill='%23e9ecef' rx='5'/%3E%3Crect x='260' y='90' width='120' height='20' fill='%23e9ecef' rx='5'/%3E%3Crect x='20' y='130' width='360' height='60' fill='%23f8f9fa' rx='10'/%3E%3Crect x='20' y='210' width='360' height='40' fill='%2338b000' rx='10'/%3E%3C/svg%3E" 
+                             alt="StudyTrack AI Dashboard Preview" class="img-fluid rounded-3 shadow-lg">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section id="features" class="features">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="display-5 fw-bold mb-3">Smart Features for Smarter Studying</h2>
+                <p class="text-muted lead">Powered by advanced machine learning algorithms</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h4>Performance Analytics</h4>
+                        <p>Track study hours, focus sessions, and productivity patterns with detailed analytics and visual reports.</p>
+                        <div class="mt-3">
+                            <span class="badge bg-primary me-2">Real-time</span>
+                            <span class="badge bg-info">Visualized</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <h4>AI Recommendations</h4>
+                        <p>Get personalized study schedule suggestions based on your learning patterns and performance data.</p>
+                        <div class="mt-3">
+                            <span class="badge bg-success me-2">Personalized</span>
+                            <span class="badge bg-warning">Adaptive</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <h4>Focus Optimization</h4>
+                        <p>AI identifies your peak focus times and suggests optimal study sessions for maximum retention.</p>
+                        <div class="mt-3">
+                            <span class="badge bg-danger me-2">Smart Timing</span>
+                            <span class="badge bg-secondary">Peak Detection</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section id="how-it-works" class="how-it-works">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="display-5 fw-bold mb-3">How StudyTrack AI Works</h2>
+                <p class="text-muted lead">Three simple steps to better study habits</p>
+            </div>
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="step-card">
+                        <div class="step-number">1</div>
+                        <h4>Track Your Study</h4>
+                        <p>Log your study sessions, subjects, and duration. Our system learns your patterns automatically.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="step-card">
+                        <div class="step-number">2</div>
+                        <h4>AI Analysis</h4>
+                        <p>Our algorithms analyze your data to identify patterns, strengths, and areas for improvement.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="step-card">
+                        <div class="step-number">3</div>
+                        <h4>Get Recommendations</h4>
+                        <p>Receive personalized study plans and habit suggestions to optimize your learning process.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-5">
+                <div class="alert alert-primary d-inline-flex align-items-center" role="alert">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <div>No complex setup required. Start tracking and get insights immediately!</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section id="dashboard" class="dashboard-preview">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="display-5 fw-bold mb-3">AI-Powered Dashboard</h2>
+                <p class="text-muted lead">Real-time insights and recommendations</p>
+            </div>
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <div class="dashboard-card">
+                        <div class="row align-items-center mb-4">
+                            <div class="col">
+                                <h4 class="mb-0">Student Performance Dashboard</h4>
+                                <small class="text-muted">Live recommendations based on your study patterns</small>
+                            </div>
+                            <div class="col-auto">
+                                <span class="metric-badge">
+                                    <i class="fas fa-sync-alt me-1"></i> Updated in real-time
+                                </span>
+                            </div>
+                        </div>
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-3 text-center">
+                                <div class="display-6 fw-bold text-success">6.2</div>
+                                <small>Avg Study Hours/Day</small>
+                            </div>
+                            <div class="col-md-3 text-center">
+                                <div class="display-6 fw-bold text-warning">78%</div>
+                                <small>Focus Efficiency</small>
+                            </div>
+                            <div class="col-md-3 text-center">
+                                <div class="display-6 fw-bold text-info">4.5</div>
+                                <small>Optimal Rating</small>
+                            </div>
+                            <div class="col-md-3 text-center">
+                                <div class="display-6 fw-bold text-primary">92%</div>
+                                <small>Goal Progress</small>
+                            </div>
+                        </div>
+                        <div class="recommendations">
+                            <h6 class="text-accent mb-3">
+                                <i class="fas fa-lightbulb me-2"></i>AI Recommendations
+                            </h6>
+                            <div class="list-group">
+                                <div class="list-group-item bg-dark border-secondary">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    Increase study sessions in the morning (9-11 AM) for better retention
+                                </div>
+                                <div class="list-group-item bg-dark border-secondary">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    Take 5-minute breaks every 25 minutes to maintain focus
+                                </div>
+                                <div class="list-group-item bg-dark border-secondary">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    Review Mathematics topics on weekends for better understanding
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="cta-section">
+        <div class="container">
+            <h2 class="display-5 fw-bold mb-4">Ready to Transform Your Study Habits?</h2>
+            <p class="lead mb-4 opacity-90">Join thousands of students already improving their study efficiency with AI</p>
+            <a href="#contact" class="cta-btn">
+                <i class="fas fa-rocket me-2"></i> Get Started Now
+            </a>
+            <p class="mt-3 small opacity-75">No registration required • Free to use</p>
+        </div>
+    </section>
+    <footer id="contact" class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <h4 class="mb-3">
+                        <i class="fas fa-brain me-2"></i> StudyTrack AI
+                    </h4>
+                    <p class="text-muted">AI-based student study habit recommender system designed to optimize learning and academic performance.</p>
+                    <div class="mt-3">
+                        <a href="#" class="btn btn-outline-light btn-sm me-2">
+                            <i class="fab fa-github"></i>
+                        </a>
+                        <a href="#" class="btn btn-outline-light btn-sm me-2">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="btn btn-outline-light btn-sm">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-4 mb-4">
+                    <h5 class="mb-3">Product</h5>
+                    <div class="footer-links">
+                        <div><a href="#features">Features</a></div>
+                        <div><a href="#how-it-works">How It Works</a></div>
+                        <div><a href="#dashboard">Dashboard</a></div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-4 mb-4">
+                    <h5 class="mb-3">Technology</h5>
+                    <div class="footer-links">
+                        <div><a href="#">Machine Learning</a></div>
+                        <div><a href="#">Data Analytics</a></div>
+                        <div><a href="#">AI Algorithms</a></div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-4 mb-4">
+                    <h5 class="mb-3">Contact</h5>
+                    <div class="footer-links">
+                        <div><i class="fas fa-envelope me-2"></i> contact@studytrack.ai</div>
+                        <div><i class="fas fa-university me-2"></i> Academic Project</div>
+                        <div><i class="fas fa-code me-2"></i> Built with ❤️ for Students</div>
+                    </div>
+                </div>
+            </div>
+            <hr class="my-4 opacity-25">
+            <div class="text-center text-muted">
+                <small>© 2024 StudyTrack AI. Project for AI-based Student Study Habit Recommender System.</small>
+            </div>
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        });
+        document.querySelectorAll('.feature-card, .step-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'opacity 0.5s, transform 0.5s';
+            observer.observe(card);
+        });
+    </script>
+</body>
+</html>

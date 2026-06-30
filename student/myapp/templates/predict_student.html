@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniTrack - Prediction Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-color: #0d141c;
+            --card-bg: #111b27;
+            --accent-color: #00f2c3;
+            --border-color: #1e2d3d;
+            --text-secondary: #718096;
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold m-0">
+            {% if error %}
+                Error
+            {% else %}
+                Performance <span class="accent-text">Dashboard</span>
+            {% endif %}
+        </h2>
+        <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-info" onclick="location.reload()">
+                <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+            </button>
+            <a href="{% url 'student_dashboard' %}" class="btn btn-sm" style="background: var(--accent-color); color: #0b141e; font-weight: 600;">
+                <i class="bi bi-arrow-left me-1"></i>New Prediction
+            </a>
+        </div>
+    </div>
+    {% if error %}
+        <div class="alert alert-danger text-center">{{ error }}</div>
+    {% else %}
+    <div class="glass p-4 mb-4" style="background: rgba(255,255,255,0.12); backdrop-filter: blur(12px); border-radius: 20px;">
+        <div class="d-flex justify-content-between align-items-center">
+            <h3 class="fw-semibold mb-0">AI Prediction</h3>
+            <span class="badge badge-risk fs-5 fw-bold px-4 py-2" style="background: {% if prediction == 'High dropout risk' %}#ff4d4d{% else %}#00f2c3{% endif %}; animation: pulse 2s infinite;">
+                {{ prediction }}
+            </span>
+        </div>
+        <hr class="my-3 opacity-25">
+        <h6 class="mb-2">📌 Recommendation</h6>
+        <p class="mb-0 opacity-90">{{ recommendation }}</p>
+    </div>
+    <div class="row g-4 mb-5">
+        <div class="col-lg-8">
+            <div class="dashboard-card">
+                <div class="card-title"><i class="bi bi-graph-up accent-text"></i>Model Performance</div>
+                <div class="chart-container">
+                    <canvas id="lineChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="dashboard-card">
+                <div class="card-title"><i class="bi bi-pie-chart accent-text"></i>Risk Distribution</div>
+                <div class="chart-container">
+                    <canvas id="pieChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-12">
+        <div class="dashboard-card">
+            <div class="card-title">
+                <i class="bi bi-person-check accent-text"></i> Your Current Metrics & Plan
+            </div>
+            <div class="table-responsive">
+                <table class="table custom-table">
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th>Current</th>
+                            <th>Status</th>
+                            <th>Priority</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="fw-bold">Study Hours</td>
+                            <td>{{ hours }} hrs</td>
+                            <td>
+                                {% if hours < 3 %}<span class="text-warning">Low</span>{% else %}<span class="text-success">Good</span>{% endif %}
+                            </td>
+                            <td>{% if hours < 3 %}<span class="badge bg-danger">High</span>{% else %}<span class="badge bg-success">Low</span>{% endif %}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Attendance</td>
+                            <td>{{ attendance }}%</td>
+                            <td>{% if attendance < 75 %}<span class="text-danger">Poor</span>{% else %}<span class="text-success">Good</span>{% endif %}</td>
+                            <td>{% if attendance < 75 %}<span class="badge bg-danger">High</span>{% else %}<span class="badge bg-success">Low</span>{% endif %}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Sleep</td>
+                            <td>{{ sleep }} hrs</td>
+                            <td>{% if sleep < 7 %}<span class="text-warning">Low</span>{% else %}<span class="text-success">Optimal</span>{% endif %}</td>
+                            <td>{% if sleep < 7 %}<span class="badge bg-warning text-dark">Medium</span>{% else %}<span class="badge bg-success">Low</span>{% endif %}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Stress</td>
+                            <td>{{ stress }}/10</td>
+                            <td>{% if stress > 7 %}<span class="text-danger">High</span>{% else %}<span class="text-success">Manageable</span>{% endif %}</td>
+                            <td>{% if stress > 7 %}<span class="badge bg-danger">High</span>{% else %}<span class="badge bg-success">Low</span>{% endif %}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Exercise</td>
+                            <td>{{ exercise }} days</td>
+                            <td>{% if exercise < 3 %}<span class="text-warning">Low</span>{% else %}<span class="text-success">Good</span>{% endif %}</td>
+                            <td>{% if exercise < 3 %}<span class="badge bg-warning text-dark">Medium</span>{% else %}<span class="badge bg-success">Low</span>{% endif %}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {% endif %}
+</div>
+<script>
+    const gridStyle = { color: '#1e2d3d' };
+    const textStyle = { color: '#718096' };
+    new Chart(document.getElementById('lineChart'), {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+                label: 'Accuracy %',
+                data: [82, 85, 84, 89, 92, 94.2],
+                borderColor: '#00f2c3',
+                tension: 0.4,
+                fill: true,
+                backgroundColor: 'rgba(0, 242, 195, 0.1)'
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            scales: { x: { grid: gridStyle, ticks: textStyle }, y: { grid: gridStyle, ticks: textStyle } },
+            plugins: { legend: { display: false } }
+        }
+    });
+    new Chart(document.getElementById('pieChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['High Risk', 'Medium Risk', 'Low Risk'],
+            datasets: [{
+                data: [{% if prediction == 'High dropout risk' %}60{% else %}15{% endif %}, 25, {% if prediction == 'Low dropout risk' %}60{% else %}15{% endif %}],
+                backgroundColor: ['#ff4d4d', '#ffd11a', '#00f2c3'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom', labels: { color: '#718096' } } }
+        }
+    });
+</script>
+<style>
+@keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(255,255,255,.4)}
+    70%{box-shadow:0 0 0 20px rgba(255,255,255,0)}
+    100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}
+}
+.glass { background: rgba(255,255,255,0.12); backdrop-filter: blur(12px); border-radius: 20px; }
+</style>
+
+</body>
+</html>

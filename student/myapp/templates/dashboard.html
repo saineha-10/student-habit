@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniTrack - Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root {
+            --bg-color: #0d141c;
+            --card-bg: #111b27;
+            --accent-color: #00f2c3;
+            --border-color: #1e2d3d;
+            --text-secondary: #718096;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: white;
+            font-family: 'Inter', sans-serif;
+            padding: 20px;
+        }
+
+        .dashboard-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 25px;
+            height: 100%;
+        }
+
+        .card-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .accent-text { color: var(--accent-color) !important; }
+
+        /* Table Styling */
+        .custom-table {
+            color: white;
+            border-color: var(--border-color);
+        }
+
+        .custom-table thead {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--accent-color);
+        }
+
+        .custom-table td {
+            background-color: transparent !important;
+            color: #cbd5e0;
+            border-bottom: 1px solid var(--border-color);
+            padding: 15px 12px;
+            vertical-align: middle;
+        }
+
+        /* Tips Cards */
+        .tip-card {
+            background: rgba(0, 242, 195, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 15px;
+            height: 100%;
+            transition: transform 0.2s;
+        }
+
+        .tip-card:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-3px);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 250px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold m-0">Performance <span class="accent-text">Dashboard</span></h2>
+        <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-info" onclick="location.reload()">
+                <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+            </button>
+            <button class="btn btn-sm btn-submit" style="background: var(--accent-color); color: #0b141e; font-weight: 600;" onclick="window.print()">
+                <i class="bi bi-download me-1"></i>Export
+            </button>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="dashboard-card">
+                <div class="card-title"><i class="bi bi-graph-up accent-text"></i>Model Accuracy Improvements [cite: 17]</div>
+                <div class="chart-container">
+                    <canvas id="lineChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="dashboard-card">
+                <div class="card-title"><i class="bi bi-pie-chart accent-text"></i>Dropout Risk Distribution [cite: 17]</div>
+                <div class="chart-container">
+                    <canvas id="pieChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-12">
+            <div class="dashboard-card">
+                <div class="card-title">
+                    <i class="bi bi-person-check accent-text"></i> Personalized Improvement Plan 
+                </div>
+                <div class="table-responsive">
+                    <table class="table custom-table">
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                <th>Current Status</th>
+                                <th>Recommendation / Advice</th>
+                                <th>Priority</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="fw-bold">Study Consistency</td>
+                                <td><span class="text-warning">Below Average</span></td>
+                                <td class="small">Maintain a minimum of 4 hours daily. Break study sessions into 50-minute blocks[cite: 8].</td>
+                                <td><span class="badge bg-danger">High</span></td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">Sleep Hygiene</td>
+                                <td><span class="text-info">Optimal</span></td>
+                                <td class="small">Great job! Maintaining 7-8 hours of sleep is significantly boosting your focus[cite: 10].</td>
+                                <td><span class="badge bg-secondary">Low</span></td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">Stress Management</td>
+                                <td><span class="text-danger">High Stress</span></td>
+                                <td class="small">Based on high stress levels, we recommend a 15-minute meditation or daily exercise[cite: 11, 12].</td>
+                                <td><span class="badge bg-warning text-dark">Medium</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-4 pt-4 border-top border-secondary">
+                    <h6 class="accent-text fw-bold mb-3"><i class="bi bi-lightbulb me-2"></i>AI-Generated Tips </h6>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="tip-card">
+                                <small class="text-secondary d-block mb-1">Academic</small>
+                                <p class="small mb-0">Increasing your attendance by 5% correlates with a 12% improvement in predicted success[cite: 9].</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="tip-card">
+                                <small class="text-secondary d-block mb-1">Wellness</small>
+                                <p class="small mb-0">Your data suggests stress spikes on low-exercise days. Aim for a 20-minute daily walk[cite: 11, 12].</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="tip-card">
+                                <small class="text-secondary d-block mb-1">Strategy</small>
+                                <p class="small mb-0">Students in your cluster benefit most from morning study sessions rather than late-night cramming[cite: 18].</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const gridStyle = { color: '#1e2d3d' };
+    const textStyle = { color: '#718096' };
+
+    // Line Chart
+    new Chart(document.getElementById('lineChart'), {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+                label: 'Accuracy %',
+                data: [82, 85, 84, 89, 92, 94.2],
+                borderColor: '#00f2c3',
+                tension: 0.4,
+                fill: true,
+                backgroundColor: 'rgba(0, 242, 195, 0.1)'
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            scales: { x: { grid: gridStyle, ticks: textStyle }, y: { grid: gridStyle, ticks: textStyle } },
+            plugins: { legend: { display: false } }
+        }
+    });
+
+    // Pie Chart
+    new Chart(document.getElementById('pieChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['High Risk', 'Medium Risk', 'Low Risk'],
+            datasets: [{
+                data: [15, 30, 55],
+                backgroundColor: ['#ff4d4d', '#ffd11a', '#00f2c3'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom', labels: { color: '#718096' } } }
+        }
+    });
+</script>
+
+</body>
+</html>

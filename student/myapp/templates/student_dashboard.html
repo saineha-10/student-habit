@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IT Performance Dashboard</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    :root {
+        --primary-blue: #0a192f;
+        --secondary-blue: #172a45;
+        --accent-blue: #64ffda;
+        --accent-light: #ccd6f6;
+        --accent-gray: #8892b0;
+        --gradient-tech: linear-gradient(135deg, #0a192f 0%, #1a365d 100%);
+    }
+    
+    body {
+        background: var(--primary-blue);
+        color: var(--accent-light);
+        font-family: 'Segoe UI', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+        min-height: 100vh;
+    }
+
+    /* Navbar */
+    .navbar {
+        background: rgba(10, 25, 47, 0.95);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(100, 255, 218, 0.1);
+        padding: 1rem 0;
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+    }
+    .navbar-brand {
+        font-weight: 700;
+        color: var(--accent-blue) !important;
+        font-size: 1.5rem;
+        display: flex;
+        align-items: center;
+    }
+    .navbar-brand i {
+        margin-right: 10px;
+        font-size: 1.3rem;
+    }
+    .nav-link {
+        color: var(--accent-gray) !important;
+        font-weight: 500;
+        transition: color 0.3s, transform 0.2s;
+        margin: 0 5px;
+        border-radius: 4px;
+        padding: 8px 15px !important;
+    }
+    .nav-link:hover {
+        color: var(--accent-blue) !important;
+        background: rgba(100, 255, 218, 0.05);
+        transform: translateY(-2px);
+    }
+
+    /* Dashboard Header */
+    .dashboard-header {
+        text-align: center;
+        padding: 40px 0 30px;
+        position: relative;
+        overflow: hidden;
+    }
+    .dashboard-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--accent-blue), transparent);
+    }
+    .dashboard-header h1 {
+        font-size: 2.8rem;
+        font-weight: 700;
+        margin-bottom: 15px;
+        background: linear-gradient(90deg, var(--accent-blue), #4dabf7);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    .user-info {
+        background: var(--secondary-blue);
+        padding: 15px 25px;
+        border-radius: 12px;
+        display: inline-block;
+        margin-top: 15px;
+        border: 1px solid rgba(100, 255, 218, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+    .user-info p {
+        margin: 5px 0;
+        font-size: 1.05rem;
+    }
+    .user-info b {
+        color: var(--accent-blue);
+    }
+
+    /* Profile Cards */
+    .card-profile {
+        margin-bottom: 30px;
+        border-radius: 16px;
+        background: var(--secondary-blue);
+        border: 1px solid rgba(100, 255, 218, 0.08);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        overflow: hidden;
+        opacity: 0;
+        transform: translateY(30px);
+        animation: fadeInUp 0.6s forwards;
+    }
+    @keyframes fadeInUp {
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .card-profile:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(100, 255, 218, 0.1);
+    }
+
+    .card-header {
+        background: linear-gradient(90deg, rgba(10, 25, 47, 0.9), rgba(23, 42, 69, 0.9));
+        color: var(--accent-blue);
+        border-radius: 0;
+        padding: 20px 25px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        border-bottom: 1px solid rgba(100, 255, 218, 0.1);
+        display: flex;
+        align-items: center;
+    }
+    .card-header i {
+        margin-right: 12px;
+        font-size: 1.2rem;
+    }
+
+    .card-body {
+        padding: 25px;
+    }
+    .card-body ul {
+        list-style: none;
+        padding-left: 0;
+        margin-bottom: 0;
+    }
+    .card-body li {
+        padding: 12px 0;
+        font-size: 1.05rem;
+        color: var(--accent-gray);
+        border-bottom: 1px solid rgba(136, 146, 176, 0.1);
+        display: flex;
+        align-items: center;
+    }
+    .card-body li:last-child {
+        border-bottom: none;
+    }
+    .card-body li i {
+        margin-right: 15px;
+        width: 24px;
+        text-align: center;
+        color: var(--accent-blue);
+        font-size: 1.1rem;
+    }
+    
+    .risk-indicator {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-left: 10px;
+    }
+    .risk-high {
+        background: rgba(255, 71, 87, 0.15);
+        color: #ff4757;
+        border: 1px solid rgba(255, 71, 87, 0.3);
+    }
+    .risk-medium {
+        background: rgba(255, 165, 2, 0.15);
+        color: #ffa502;
+        border: 1px solid rgba(255, 165, 2, 0.3);
+    }
+    .risk-low {
+        background: rgba(46, 213, 115, 0.15);
+        color: #2ed573;
+        border: 1px solid rgba(46, 213, 115, 0.3);
+    }
+
+    /* Recommendations */
+    .recommendations {
+        background: rgba(10, 25, 47, 0.5);
+        padding: 20px;
+        border-radius: 12px;
+        margin-top: 25px;
+        border-left: 4px solid var(--accent-blue);
+    }
+    .recommendations h5 {
+        color: var(--accent-blue);
+        margin-bottom: 15px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+    }
+    .recommendations h5 i {
+        margin-right: 10px;
+    }
+    .recommendations ul {
+        margin-bottom: 0;
+    }
+    .recommendations li {
+        padding: 8px 0;
+        color: var(--accent-light);
+        border-bottom: none;
+        font-size: 1rem;
+    }
+    .recommendations li i {
+        color: #2ed573;
+        font-size: 0.9rem;
+    }
+
+    /* Compact Charts */
+    .metrics-chart {
+        max-width: 500px;
+        margin: 0 auto 40px;
+        background: var(--secondary-blue);
+        padding: 20px;
+        border-radius: 16px;
+        border: 1px solid rgba(100, 255, 218, 0.08);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        height: 300px;
+        position: relative;
+    }
+    
+    .chart-container {
+        position: relative;
+        height: 250px;
+        width: 100%;
+    }
+    
+    .chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid rgba(100, 255, 218, 0.1);
+    }
+    
+    .chart-title {
+        font-size: 1.1rem;
+        color: var(--accent-blue);
+        font-weight: 600;
+    }
+    
+    .chart-actions {
+        display: flex;
+        gap: 8px;
+    }
+    
+    .chart-btn {
+        background: rgba(100, 255, 218, 0.1);
+        border: 1px solid rgba(100, 255, 218, 0.2);
+        color: var(--accent-blue);
+        border-radius: 6px;
+        padding: 5px 10px;
+        font-size: 0.8rem;
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+    
+    .chart-btn:hover {
+        background: rgba(100, 255, 218, 0.2);
+    }
+
+    /* Empty Dashboard */
+    .empty-dashboard {
+        text-align: center;
+        margin: 60px 0;
+        padding: 40px;
+        background: var(--secondary-blue);
+        border-radius: 16px;
+        border: 2px dashed rgba(100, 255, 218, 0.2);
+    }
+    .empty-dashboard i {
+        font-size: 3.5rem;
+        color: var(--accent-gray);
+        margin-bottom: 20px;
+        display: block;
+    }
+    .empty-dashboard h3 {
+        color: var(--accent-light);
+        margin-bottom: 15px;
+    }
+    .empty-dashboard p {
+        color: var(--accent-gray);
+        max-width: 500px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .dashboard-header h1 {
+            font-size: 2.2rem;
+        }
+        .metrics-chart {
+            max-width: 100%;
+            height: 280px;
+        }
+        .chart-container {
+            height: 230px;
+        }
+    }
+    
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+        width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+        background: var(--primary-blue);
+    }
+    ::-webkit-scrollbar-thumb {
+        background: var(--accent-blue);
+        border-radius: 4px;
+    }
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg sticky-top">
+  <div class="container">
+    <a class="navbar-brand" href="#"><i class="fa-solid fa-terminal"></i>  Performance Dashboard</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu">
+      <span class="navbar-toggler-icon" style="color: var(--accent-blue);"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarMenu">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="{% url 'index' %}"><i class="fa-solid fa-chart-line"></i> AI Analytics</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<div class="container">
+    <div class="dashboard-header">
+        <h1>Performance Dashboard</h1>
+        <div class="user-info">
+            <p><b><i class="fa-solid fa-user"></i> Name:</b> {{ student.full_name }} | <b><i class="fa-solid fa-envelope"></i> Email:</b> {{ student.email }}</p>
+        </div>
+    </div>
+
+    {% if profiles %}
+        {% for profile in profiles %}
+        <div class="card card-profile" style="animation-delay: {{ forloop.counter0|add:0.1 }}s">
+            <div class="card-header">
+                <i class="fa-solid fa-code-branch"></i> Sprint Report - {{ profile.created_at|date:"M d, Y H:i" }}
+            </div>
+            <div class="card-body">
+                <ul>
+                    <li><i class="fa-solid fa-laptop-code"></i> <b>Focus Hours:</b> {{ profile.study_hours_per_day }} hrs/day</li>
+                    <li><i class="fa-solid fa-calendar-check"></i> <b>Meeting Attendance:</b> {{ profile.attendance_percentage }}%</li>
+                    <li><i class="fa-solid fa-moon"></i> <b>Rest Hours:</b> {{ profile.sleep_hours }} hrs/night</li>
+                    <li><i class="fa-solid fa-brain"></i> <b>Burnout Risk:</b> {{ profile.stress_level }}/10 
+                        {% if profile.stress_level > 7 %}
+                            <span class="risk-indicator risk-high">High</span>
+                        {% elif profile.stress_level > 4 %}
+                            <span class="risk-indicator risk-medium">Medium</span>
+                        {% else %}
+                            <span class="risk-indicator risk-low">Low</span>
+                        {% endif %}
+                    </li>
+                    <li><i class="fa-solid fa-dumbbell"></i> <b>Wellness Activity:</b> {{ profile.exercise_frequency }} days/week</li>
+                    <li><i class="fa-solid fa-chart-line"></i> <b>Performance Risk:</b> {{ profile.dropout_risk }}
+                        {% if profile.dropout_risk == "High" %}
+                            <span class="risk-indicator risk-high">Action Required</span>
+                        {% elif profile.dropout_risk == "Medium" %}
+                            <span class="risk-indicator risk-medium">Monitor</span>
+                        {% else %}
+                            <span class="risk-indicator risk-low">Stable</span>
+                        {% endif %}
+                    </li>
+                </ul>
+
+                {% if profile.recommendations_list %}
+                <div class="recommendations">
+                    <h5><i class="fa-solid fa-lightbulb"></i> Optimization Recommendations</h5>
+                    <ul>
+                        {% for rec in profile.recommendations_list %}
+                        <li><i class="fa-solid fa-code"></i> {{ rec }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="metrics-chart">
+            <div class="chart-header">
+                <div class="chart-title">
+                    <i class="fa-solid fa-chart-bar"></i> Performance Metrics
+                </div>
+                <div class="chart-actions">
+                    <button class="chart-btn" onclick="changeChartType('bar', {{ forloop.counter }})">Bar</button>
+                    <button class="chart-btn" onclick="changeChartType('line', {{ forloop.counter }})">Line</button>
+                    <button class="chart-btn" onclick="changeChartType('radar', {{ forloop.counter }})">Radar</button>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="chart-{{ forloop.counter }}"></canvas>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-dashboard">
+            <i class="fa-solid fa-database"></i>
+            <h3>No Performance Data Available</h3>
+            <p>Submit your sprint report to view performance analytics and recommendations. Data will appear here once submitted.</p>
+            <button class="btn btn-primary mt-3" style="background: var(--accent-blue); border-color: var(--accent-blue); color: var(--primary-blue);">
+                <i class="fa-solid fa-plus"></i> Submit First Report
+            </button>
+        </div>
+    {% endif %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const chartInstances = {};
+document.addEventListener('DOMContentLoaded', function() {
+    {% for profile in profiles %}
+    const ctx{{ forloop.counter }} = document.getElementById('chart-{{ forloop.counter }}').getContext('2d');
+    chartInstances[{{ forloop.counter }}] = new Chart(ctx{{ forloop.counter }}, {
+        type: 'bar',
+        data: {
+            labels: ['Focus Hours', 'Attendance %', 'Rest Hours', 'Burnout Risk', 'Wellness'],
+            datasets: [{
+                label: 'Sprint Metrics',
+                data: [
+                    {{ profile.study_hours_per_day }}, 
+                    {{ profile.attendance_percentage }}, 
+                    {{ profile.sleep_hours }}, 
+                    {{ profile.stress_level }}, 
+                    {{ profile.exercise_frequency }}
+                ],
+                backgroundColor: [
+                    'rgba(100, 255, 218, 0.7)',
+                    'rgba(77, 171, 247, 0.7)',
+                    'rgba(136, 146, 176, 0.7)',
+                    'rgba(255, 71, 87, 0.7)',
+                    'rgba(46, 213, 115, 0.7)'
+                ],
+                borderColor: [
+                    'rgba(100, 255, 218, 1)',
+                    'rgba(77, 171, 247, 1)',
+                    'rgba(136, 146, 176, 1)',
+                    'rgba(255, 71, 87, 1)',
+                    'rgba(46, 213, 115, 1)'
+                ],
+                borderWidth: 1,
+                borderRadius: 6,
+                barPercentage: 0.7,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { 
+                legend: { 
+                    display: false 
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(10, 25, 47, 0.9)',
+                    titleColor: '#64ffda',
+                    bodyColor: '#ccd6f6',
+                    borderColor: '#64ffda',
+                    borderWidth: 1,
+                    cornerRadius: 6
+                }
+            },
+            scales: { 
+                y: { 
+                    beginAtZero: true, 
+                    ticks: { 
+                        color: '#8892b0',
+                        font: { size: 11 }
+                    },
+                    grid: {
+                        color: 'rgba(136, 146, 176, 0.1)'
+                    }
+                },
+                x: { 
+                    ticks: { 
+                        color: '#8892b0',
+                        font: { size: 11 }
+                    },
+                    grid: {
+                        color: 'rgba(136, 146, 176, 0.1)'
+                    }
+                } 
+            }
+        }
+    });
+    {% endfor %}
+    const cards = document.querySelectorAll('.card-profile');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.animationPlayState = 'running';
+            }
+        });
+    }, { threshold: 0.1 });
+    
+    cards.forEach(card => {
+        observer.observe(card);
+    });
+});
+function changeChartType(type, chartId) {
+    if (chartInstances[chartId]) {
+        chartInstances[chartId].config.type = type;
+        chartInstances[chartId].update();
+    }
+}
+</script>
+</body>
+</html>
